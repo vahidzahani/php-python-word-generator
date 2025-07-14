@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Upload with Drag & Drop</title>
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; padding: 40px; }
+    .drop-zone {
+      border: 2px dashed #888;
+      padding: 30px;
+      text-align: center;
+      background: #fff;
+      color: #666;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .drop-zone.highlight { border-color: #2196f3; color: #2196f3; }
+    ul#file-list { list-style: none; padding: 0; }
+    ul#file-list li {
+      background: #fff;
+      border: 1px solid #ccc;
+      margin-bottom: 5px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .remove-btn {
+      background: crimson;
+      color: #fff;
+      border: none;
+      padding: 2px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    button#upload-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    #result { margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <h2>📤 Upload Images to Word Document</h2>
+
+  <div class="drop-zone" id="drop-zone">Drag & drop images here or click to select</div>
+  <input type="file" id="file-input" multiple style="display: none;">
+
+  <ul id="file-list"></ul>
+
+  <button id="upload-btn">Upload and Generate Word</button>
+
+  <div id="result"></div>
+
+  <script>
+    var dropZone = document.getElementById('drop-zone');
+    var fileInput = document.getElementById('file-input');
+    var fileList = document.getElementById('file-list');
+    var uploadBtn = document.getElementById('upload-btn');
+    var result = document.getElementById('result');
+
+    let files = [];
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('highlight');
+    });
+
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('highlight'));
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('highlight');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', () => {
+      handleFiles(fileInput.files);
+    });
+
+    function handleFiles(selectedFiles) {
+      for (let i = 0; i < selectedFiles.length; i++) {
+        files.push(selectedFiles[i]);
+      }
+      renderFileList();
+    }
+
+    function renderFileList() {
+      fileList.innerHTML = '';
+      files.forEach((file, index) => {
+        let li = document.createElement('li');
+        li.innerHTML = file.name + ' <button class="remove-btn" onclick="removeFile(' + index + ')">Remove</button>';
+        fileList.appendChild(li);
+      });
+    }
+
+    function removeFile(index) {
+      files.splice(index, 1);
+      renderFileList();
+    }
+
+    uploadBtn.addEventListener('click', () => {
+      if (files.length === 0) {
+        alert('Please add at least one image.');
+        return;
+      }
+
+      let formData = new FormData();
+      files.forEach(file => formData.append('images[]', file));
+
+      result.innerHTML = '⏳ Uploading... Please wait.';
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'uploadpic.php', true);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          result.innerHTML = xhr.responseText;
+        } else {
+          result.innerHTML = '<span style="color:red;">Upload failed.</span>';
+        }
+      };
+      xhr.send(formData);
+    });
+  </script>
+
+</body>
+</html>
