@@ -141,7 +141,7 @@ Try uploading multiple images, then download the final Word file after processin
 
 ## 👨‍💻 Author
 
-Made with ❤️ by [Vahid](mailto:your@email.com)
+Made with ❤️ by [Vahidzahani](mailto:vahid.zahani@gmail.com)
 
 ---
 
